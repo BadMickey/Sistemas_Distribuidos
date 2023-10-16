@@ -1,0 +1,14 @@
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\bin\Debug\net6.0\TesteConexao2.exe
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\bin\Debug\net6.0\TesteConexao2.deps.json
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\bin\Debug\net6.0\TesteConexao2.runtimeconfig.json
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\bin\Debug\net6.0\TesteConexao2.dll
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\bin\Debug\net6.0\TesteConexao2.pdb
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.AssemblyInfoInputs.cache
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.AssemblyInfo.cs
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.csproj.CoreCompileInputs.cache
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.dll
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\refint\TesteConexao2.dll
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.pdb
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\TesteConexao2.genruntimeconfig.cache
+C:\Users\SuasVendas\source\repos\Sistemas_Distribuidos\TesteConexao\TesteConexao2\obj\Debug\net6.0\ref\TesteConexao2.dll
