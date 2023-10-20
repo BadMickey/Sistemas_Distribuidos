@@ -24,7 +24,7 @@ class Program
         client.Connect(remoteIP, port);
 
         // Inicie a thread para receber mensagens do servidor
-        Thread receiveThread = new Thread(ReceiveMessages);
+        Thread receiveThread = new Thread(() => ReceiveMessages(listener));
         receiveThread.Start();
 
         // Loop para enviar mensagens
@@ -36,9 +36,10 @@ class Program
         }
     }
 
-    static void ReceiveMessages()
+    static void ReceiveMessages(TcpListener listener)
     {
-        NetworkStream stream = client.GetStream();
+        TcpClient receiver = listener.AcceptTcpClient();
+        NetworkStream stream = receiver.GetStream();
         while (true)
         {
             byte[] buffer = new byte[1024];
