@@ -45,7 +45,7 @@ class Program
             byte[] buffer = new byte[1024];
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
             string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-            Console.WriteLine("Mensagem recebida: " + dataReceived);
+            Console.WriteLine("\nMensagem recebida: " + dataReceived);
         }
     }
 
