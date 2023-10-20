@@ -6,22 +6,31 @@ using System.Threading;
 
 class Program
 {
+    static TcpListener listener;
     static TcpClient client;
-    static NetworkStream stream;
 
     static void Main()
     {
+        string remoteIP = "192.168.0.143";
+
+        // Inicie o servidor
+        IPAddress localAddr = IPAddress.Parse("192.168.0.217"); // Escuta em todas as interfaces
+        int port = 13000;
+        listener = new TcpListener(localAddr, port);
+        listener.Start();
+
+        // Conecte-se ao outro cliente (máquina)
         client = new TcpClient();
-        client.Connect("10.4.3.103", 13000); // Substitua "EnderecoIPDoCliente1" pelo IP do Cliente 1
+        client.Connect(remoteIP, port);
 
-        stream = client.GetStream();
-
+        // Inicie a thread para receber mensagens do servidor
         Thread receiveThread = new Thread(ReceiveMessages);
         receiveThread.Start();
 
+        // Loop para enviar mensagens
         while (true)
         {
-            Console.Write("Cliente 2: ");
+            Console.Write("Digite uma mensagem para enviar ao outro cliente: ");
             string message = Console.ReadLine();
             SendMessage(message);
         }
@@ -29,17 +38,19 @@ class Program
 
     static void ReceiveMessages()
     {
+        NetworkStream stream = client.GetStream();
         while (true)
         {
             byte[] buffer = new byte[1024];
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
             string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-            Console.WriteLine("Cliente 1: " + dataReceived);
+            Console.WriteLine("Mensagem recebida: " + dataReceived);
         }
     }
 
     static void SendMessage(string message)
     {
+        NetworkStream stream = client.GetStream();
         byte[] data = Encoding.ASCII.GetBytes(message);
         stream.Write(data, 0, data.Length);
     }
