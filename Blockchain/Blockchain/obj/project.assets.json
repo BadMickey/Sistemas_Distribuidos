@@ -2215,11 +2215,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
+      "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
       "projectName": "ProjetoBlockchain",
-      "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
+      "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
       "packagesPath": "C:\\Users\\SuasVendas\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\Blockchain\\obj\\",
+      "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\SuasVendas\\AppData\\Roaming\\NuGet\\NuGet.Config",

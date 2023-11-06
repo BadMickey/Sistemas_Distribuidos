@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace ProjetoBlockchain
 {
-    public class Program
+    public class Program1
     {
         //Aqui definimos o que é necessário globalmente
         static MqttClient mqttClient;

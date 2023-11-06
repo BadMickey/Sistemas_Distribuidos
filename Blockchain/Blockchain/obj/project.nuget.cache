@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PFWiBMGZIjiKMdTxz1ZzMPbTHYzfwRGLqUWsYANv2QFyFVhPwGjgowjbaLVrdp4h4Z5MJpY1XyiWALc41vPDEQ==",
+  "dgSpecHash": "uwBUzHnSDzvRgiqi/0At2lL4g6T8Tuu0GbXi/z/St+aoFJaSUftQaG/34KZ30ClWJwie1FNz1Va5GqRU2Khc0w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
+  "projectFilePath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\SuasVendas\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\SuasVendas\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

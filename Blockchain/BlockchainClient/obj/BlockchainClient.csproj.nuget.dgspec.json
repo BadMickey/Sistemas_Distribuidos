@@ -1,32 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj": {}
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\BlockchainClient\\BlockchainClient.csproj": {}
   },
   "projects": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj": {
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\BlockchainClient\\BlockchainClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
-        "projectName": "ProjetoBlockchain",
-        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
+        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\BlockchainClient\\BlockchainClient.csproj",
+        "projectName": "BlockchainClient",
+        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\BlockchainClient\\BlockchainClient.csproj",
         "packagesPath": "C:\\Users\\SuasVendas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\obj\\",
+        "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\BlockchainClient\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\SuasVendas\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0"
+          "net7.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net6.0": {
-            "targetAlias": "net6.0",
+          "net7.0": {
+            "targetAlias": "net7.0",
             "projectReferences": {}
           }
         },
@@ -37,24 +37,16 @@
         }
       },
       "frameworks": {
-        "net6.0": {
-          "targetAlias": "net6.0",
+        "net7.0": {
+          "targetAlias": "net7.0",
           "dependencies": {
-            "M2Mqtt": {
-              "target": "Package",
-              "version": "[4.3.0, )"
-            },
-            "Microsoft.Data.SqlClient": {
-              "target": "Package",
-              "version": "[5.1.1, )"
-            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
             },
             "Npgsql": {
               "target": "Package",
-              "version": "[7.0.4, )"
+              "version": "[7.0.6, )"
             }
           },
           "imports": [

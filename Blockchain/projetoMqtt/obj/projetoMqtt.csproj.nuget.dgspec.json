@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj": {}
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj": {}
   },
   "projects": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj": {
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj",
+        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj",
         "projectName": "projetoMqtt",
-        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj",
+        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\projetoMqtt\\projetoMqtt.csproj",
         "packagesPath": "C:\\Users\\SuasVendas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Blockchain\\projetoMqtt\\obj\\",
+        "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\projetoMqtt\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\SuasVendas\\AppData\\Roaming\\NuGet\\NuGet.Config",

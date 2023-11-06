@@ -86,7 +86,6 @@ namespace Banco
                         command.ExecuteNonQuery();
                     }
                 }
-                connection.Close();
             }
         }
         //Adiciona o bloco na blockchain e BD
@@ -130,31 +129,6 @@ namespace Banco
 
                     command.ExecuteNonQuery();
                 }
-                connection.Close();
-            }
-        }
-        public void AddBlock(Block receivedBlock)
-        {
-            chain.Add(receivedBlock);
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
-            {
-                connection.Open();
-
-                string query = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Nonce", receivedBlock.Nonce);
-                    command.Parameters.AddWithValue("@Timestamp", receivedBlock.Timestamp);
-                    command.Parameters.AddWithValue("@SensorId", receivedBlock.SensorId);
-                    command.Parameters.AddWithValue("@Address", receivedBlock.Address);
-                    command.Parameters.AddWithValue("@MotionDetected", receivedBlock.MotionDetected);
-                    command.Parameters.AddWithValue("@PreviousHash", receivedBlock.PreviousHash);
-                    command.Parameters.AddWithValue("@Hash", receivedBlock.Hash);
-
-                    command.ExecuteNonQuery();
-                }
-                connection.Close();
             }
         }
         //Calcula o hash
@@ -188,7 +162,7 @@ namespace Banco
             }
             return true;
         }
-            //Verifica se a blockchain está válida
+        //Verifica se a blockchain está válida
         public string IsChainValid()
         {
             for (int i = 1; i < chain.Count; i++)
@@ -245,17 +219,10 @@ namespace Banco
 
                     command.ExecuteNonQuery();
                 }
-                connection.Close();
             }
         }
-
-        public List<Block> GetChain()
-        {
-            return chain;
-        }
-
-            //Busca o bloco mais recente que possui um determinado ID de sensor
-            public Block GetLatestBlockForSensor(int sensorId)
+        //Busca o bloco mais recente que possui um determinado ID de sensor
+        public Block GetLatestBlockForSensor(int sensorId)
         {
             return chain.LastOrDefault(b => b.SensorId == sensorId);
         }
