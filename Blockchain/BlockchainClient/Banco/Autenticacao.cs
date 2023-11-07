@@ -18,7 +18,7 @@ namespace ProjetoBlockchain.Banco
 
             if (Email.Equals(EmailAutoridade) && Senha.Equals(SenhaAutoridade))
             {
-                Program1.AcessoAutoridadeModeradora = true;
+ //               Program1.AcessoAutoridadeModeradora = true;
             }
         }
     }

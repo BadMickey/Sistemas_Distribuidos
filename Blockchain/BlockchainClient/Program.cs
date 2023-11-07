@@ -8,11 +8,13 @@ using Banco;
 
 public class NodeClient
 {
-    private const string serverIPAddress = "IP_DO_SERVIDOR"; // Substitua pelo IP do servidor
+    private const string serverIPAddress = "192.168.0.217"; // Substitua pelo IP do servidor
     private const int serverPort = 13000;
+    static string connectionString = "Server=localhost;Port=5433;User Id=postgres;Password=0000;database=Blockchain";
+
 
     private TcpClient client;
-    private Blockchain blockchain;
+    static Blockchain blockchain = new Blockchain(connectionString);
 
     public NodeClient()
     {
@@ -48,29 +50,37 @@ public class NodeClient
     private void ReceiveChain()
     {
         NetworkStream stream = client.GetStream();
-        byte[] buffer = new byte[1024];
-        int bytesRead = stream.Read(buffer, 0, buffer.Length);
-        string chainData = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        MemoryStream outputStream = new MemoryStream();
+        string teste = stream.ToString();
+        byte[] buffer = new byte[2048];
+        while (stream.DataAvailable)
+        {
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            outputStream.Write(buffer, 0, bytesRead);
+        }
+       // int bytesRead = stream.Read(buffer, 0, buffer.Length);
+        string chainData = Encoding.ASCII.GetString(outputStream.ToArray());
 
         List<Block> receivedChain = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Block>>(chainData);
         Console.WriteLine("Cadeia de blocos recebida do servidor:");
 
         foreach (Block block in receivedChain)
         {
-            Console.WriteLine($"Bloco {block.Nonce}");
+            blockchain.AddBlock(block);
         }
     }
 
     private Block CreateNewBlock()
     {
+
         Block newBlock = new Block
         {
-            Nonce = 1, // Substitua pelo índice correto
+            Nonce = blockchain.GetPreviousNonce() + 1, // Substitua pelo índice correto
             Timestamp = DateTime.Now,
             SensorId = 1,
             Address = "a",
             MotionDetected = true,
-            PreviousHash = "Hash do bloco anterior",
+            PreviousHash = blockchain.GetPreviousHash(),
             Hash = string.Empty
         };
 
@@ -101,8 +111,7 @@ public class NodeClient
             string blockData = dataReceived.Replace("ADD_BLOCK:", "");
             Block receivedBlock = Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(blockData);
 
-            // Você pode verificar se o bloco foi aceito pelo servidor aqui
-            Console.WriteLine("Bloco recebido do servidor: " + receivedBlock.Nonce);
+            blockchain.AddBlock(receivedBlock);
         }
     }
 }
