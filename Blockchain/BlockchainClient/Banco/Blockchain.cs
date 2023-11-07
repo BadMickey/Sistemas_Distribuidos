@@ -17,7 +17,7 @@ namespace Banco
         public Blockchain(string connectionString)
         {
             this.connectionString = connectionString;
-            InitializeBlockchain();
+            //InitializeBlockchain();
         }
         //Inicializa a blockchain
         private void InitializeBlockchain()
@@ -89,30 +89,12 @@ namespace Banco
             }
         }
         //Adiciona o bloco na blockchain e BD
-        public void AddBlock(int sensorId, string address, bool motionDetected)
+        public void AddBlock(Block Sendedblock)
         {
-            Block previousBlock = chain[chain.Count - 1];
-            int newNonce = previousBlock.Nonce + 1;
-            DateTime newTimestamp = DateTime.Now;
+            
+            chain.Add(Sendedblock);
 
-            Block newBlock = new Block
-            {
-                Nonce = newNonce,
-                Timestamp = newTimestamp,
-                SensorId = sensorId,
-                Address = address,
-                MotionDetected = motionDetected,
-                PreviousHash = previousBlock.Hash,
-                Hash = string.Empty
-            };
-
-
-            string newHash = CalculateHash(newBlock);
-
-            newBlock.Hash = newHash;
-            chain.Add(newBlock);
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+            /*using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
 
@@ -129,7 +111,7 @@ namespace Banco
 
                     command.ExecuteNonQuery();
                 }
-            }
+            }*/
         }
         //Calcula o hash
         public string CalculateHash(Block block)
@@ -225,6 +207,16 @@ namespace Banco
         public Block GetLatestBlockForSensor(int sensorId)
         {
             return chain.LastOrDefault(b => b.SensorId == sensorId);
+        }
+
+        public string GetPreviousHash()
+        {
+            return chain.Last().Hash;
+        }
+
+        public int GetPreviousNonce()
+        {
+            return chain.Last().Nonce;
         }
     }
 
