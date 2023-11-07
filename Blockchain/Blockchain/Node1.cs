@@ -50,7 +50,7 @@ namespace ProjetoBlockchain
             byte[] buffer = new byte[1024];
             int bytesRead;
 
-            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+           while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
                 string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
@@ -63,10 +63,11 @@ namespace ProjetoBlockchain
                     {
                         blockchain.AddBlock(receivedBlock);
                         Console.WriteLine("Bloco adicionado com sucesso: " + receivedBlock.Nonce);
+                        PropagateBlock(blockData, client);
+
                     }
 
                     // Propague o bloco para outros clientes
-                    PropagateBlock(blockData, client);
                 }
 
                 if (dataReceived == "REQUEST_CHAIN")
@@ -86,7 +87,7 @@ namespace ProjetoBlockchain
         {
             foreach (TcpClient client in clients)
             {
-                if (client != senderClient)
+                if (client == senderClient)
                 {
                     NetworkStream stream = client.GetStream();
                     byte[] blockBytes = Encoding.ASCII.GetBytes("ADD_BLOCK:" + blockData);
