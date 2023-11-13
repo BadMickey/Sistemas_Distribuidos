@@ -31,10 +31,12 @@ public class NodeClient
 
         while (true)
         {
-            Console.WriteLine("Você pode escolher entre:");
+            Console.WriteLine("Bem-vindo a central de controle do nó cliente, você tem as seguintes ações:");
             Console.WriteLine("1 - Enviar um bloco para a rede");
             Console.WriteLine("2 - Verificar se a cadeia local está válida");
             Console.WriteLine("3 - Alterar um bloco");
+            Console.WriteLine("4 - Localizar o bloco mais recente de um determinado sensor");
+            Console.WriteLine("Digite a opção apenas usando número, caso não faça, não irá executar nada!!");
             int opcao = Convert.ToInt32(Console.ReadLine());
 
             switch (opcao)
@@ -58,17 +60,32 @@ public class NodeClient
                     Console.ReadKey();
                     break;
                 case 3:
+                    Console.Clear();
+                    Console.WriteLine("Por favor digite o id do sensor a ter o status alterado: ");
+                    sensorid = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Por favor digite o novo status: ");
+                    bool NewStatus = bool.Parse(Console.ReadLine());
+                    Block modBlock = blockchain.ChangeSensorStatus(sensorid, NewStatus);
+                    Console.WriteLine("Bloco com novo status do sensor montado!");
+                    SendBlock(modBlock);
+                    ReceiveBlock();
+                    Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
+                    Console.ReadKey();
+                    break;
+                case 4:
+                    Console.Clear();
+                    Console.Write("Digite o ID do sensor para localizar: ");
+                    int SensorLocalize = Convert.ToInt32(Console.ReadLine());
+                    Block latestBlock = blockchain.GetLatestBlockForSensor(SensorLocalize);
+                    Console.WriteLine($"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");
+                    Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
+                    Console.ReadKey();
+                    break;
+                default:
+                    Console.Clear();
                     break;
             }
         }
-
-        // Solicita a cadeia de blocos do servidor
-
-        // Crie e adicione um bloco ao servidor
-        //Block newBlock = CreateNewBlock();
-        //SendBlock(newBlock);
-
-        // Aguarde a resposta do servidor
     }
 
     private void RequestChain()

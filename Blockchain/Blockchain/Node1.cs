@@ -51,7 +51,7 @@ namespace ProjetoBlockchain
             int bytesRead;
 
            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
+           {
                 string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
                 if (dataReceived.StartsWith("ADD_BLOCK:"))
@@ -77,7 +77,7 @@ namespace ProjetoBlockchain
                     byte[] chainBytes = Encoding.UTF8.GetBytes(chainData);
                     stream.Write(chainBytes, 0, chainBytes.Length);
                 }
-            }
+           }
 
             clients.Remove(client);
             client.Close();
