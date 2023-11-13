@@ -52,7 +52,7 @@ namespace ProjetoBlockchain
 
            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
-                string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
                 if (dataReceived.StartsWith("ADD_BLOCK:"))
                 {
@@ -74,7 +74,7 @@ namespace ProjetoBlockchain
                 {
                     List<Block> chain = blockchain.GetChain();
                     string chainData = Newtonsoft.Json.JsonConvert.SerializeObject(chain);
-                    byte[] chainBytes = Encoding.ASCII.GetBytes(chainData);
+                    byte[] chainBytes = Encoding.UTF8.GetBytes(chainData);
                     stream.Write(chainBytes, 0, chainBytes.Length);
                 }
             }
@@ -90,7 +90,7 @@ namespace ProjetoBlockchain
                 if (client == senderClient)
                 {
                     NetworkStream stream = client.GetStream();
-                    byte[] blockBytes = Encoding.ASCII.GetBytes("ADD_BLOCK:" + blockData);
+                    byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
                     stream.Write(blockBytes, 0, blockBytes.Length);
                 }
             }

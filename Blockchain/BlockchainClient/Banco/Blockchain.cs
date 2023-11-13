@@ -30,7 +30,7 @@ namespace Banco
             using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
-
+                Boolean vazio = false;
                 string query = "SELECT * FROM blocks ORDER BY Nonce ASC";
                 using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                 {
@@ -53,76 +53,95 @@ namespace Banco
                                 };
                                 chain2.Add(receivedBlock);
                             }
-                            var errorBlocks = chain2.Where(blocoAtrasado => chain.Any(blocoAtualizado => blocoAtualizado.PreviousHash == blocoAtrasado.PreviousHash || 
-                                blocoAtualizado.Hash == blocoAtrasado.Hash)).ToList();
-
-                            if(errorBlocks.Any() )
-                            {
-                                using (NpgsqlCommand command1 = new NpgsqlCommand($"TRUNCATE TABLE blocks", connection))
-                                {
-                                    command1.ExecuteNonQuery();
-                                }
-
-                                foreach (Block block in chain)
-                                {
-                                    string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                                    using (NpgsqlCommand command2 = new NpgsqlCommand(query2, connection))
-                                    {
-                                        command2.Parameters.AddWithValue("@Nonce", block.Nonce);
-                                        command2.Parameters.AddWithValue("@Timestamp", block.Timestamp);
-                                        command2.Parameters.AddWithValue("@SensorId", block.SensorId);
-                                        command2.Parameters.AddWithValue("@Address", block.Address);
-                                        command2.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
-                                        command2.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
-                                        command2.Parameters.AddWithValue("@Hash", block.Hash);
-
-                                        command2.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                List<Block> attChain = chain.Where(bloco => !chain2.Any(bloco2 => bloco2.Hash == bloco.PreviousHash)).ToList();
-
-                                foreach (Block block in attChain)
-                                {
-                                    string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                                    using (NpgsqlCommand command3 = new NpgsqlCommand(query2, connection))
-                                    {
-                                        command3.Parameters.AddWithValue("@Nonce", block.Nonce);
-                                        command3.Parameters.AddWithValue("@Timestamp", block.Timestamp);
-                                        command3.Parameters.AddWithValue("@SensorId", block.SensorId);
-                                        command3.Parameters.AddWithValue("@Address", block.Address);
-                                        command3.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
-                                        command3.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
-                                        command3.Parameters.AddWithValue("@Hash", block.Hash);
-
-                                        command3.ExecuteNonQuery();
-                                    }
-                                }
-                            }                           
                         }
                         else
                         {
-                            foreach (Block block in receivedChain)
-                            {
-                                string query1 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                                using (NpgsqlCommand command1 = new NpgsqlCommand(query1, connection))
-                                {
-                                    command1.Parameters.AddWithValue("@Nonce", block.Nonce);
-                                    command1.Parameters.AddWithValue("@Timestamp", block.Timestamp);
-                                    command1.Parameters.AddWithValue("@SensorId", block.SensorId);
-                                    command1.Parameters.AddWithValue("@Address", block.Address);
-                                    command1.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
-                                    command1.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
-                                    command1.Parameters.AddWithValue("@Hash", block.Hash);
-
-                                    command1.ExecuteNonQuery();
-                                }
-                            }
+                            vazio = true;
                         }
                     }
                 }
+
+                var errorBlocks = chain2
+            .Where(blocoAtrasado => !chain
+                .Any(blocoAtualizado =>
+                    blocoAtualizado.PreviousHash == blocoAtrasado.PreviousHash &&
+                    blocoAtualizado.Hash == blocoAtrasado.Hash))
+            .ToList();
+
+
+                if (vazio)
+                {
+                    foreach (Block block in receivedChain)
+                    {
+                        string query1 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                        using (NpgsqlCommand command4 = new NpgsqlCommand(query1, connection))
+                        {
+                            command4.Parameters.AddWithValue("@Nonce", block.Nonce);
+                            command4.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                            command4.Parameters.AddWithValue("@SensorId", block.SensorId);
+                            command4.Parameters.AddWithValue("@Address", block.Address);
+                            command4.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                            command4.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                            command4.Parameters.AddWithValue("@Hash", block.Hash);
+
+                            command4.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+                else if (errorBlocks.Any())
+                {
+                    using (NpgsqlCommand command1 = new NpgsqlCommand($"TRUNCATE TABLE blocks", connection))
+                    {
+                        command1.ExecuteNonQuery();
+                    }
+
+                    foreach (Block block in chain)
+                    {
+                        string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                        using (NpgsqlCommand command2 = new NpgsqlCommand(query2, connection))
+                        {
+                            command2.Parameters.AddWithValue("@Nonce", block.Nonce);
+                            command2.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                            command2.Parameters.AddWithValue("@SensorId", block.SensorId);
+                            command2.Parameters.AddWithValue("@Address", block.Address);
+                            command2.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                            command2.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                            command2.Parameters.AddWithValue("@Hash", block.Hash);
+
+                            command2.ExecuteNonQuery();
+                        }
+                    }
+                }
+                else
+                {
+                    //List<Block> attChain = chain.Where(bloco => !chain2.Any(bloco2 => bloco2.Hash == bloco.PreviousHash)).ToList();
+
+                    List<Block> attChain = chain
+            .Where(blocoAtualizado => !chain2
+                .Any(blocoAtrasado =>
+                    blocoAtrasado.Hash == blocoAtualizado.Hash))
+            .ToList();
+
+                    foreach (Block block in attChain)
+                    {
+                        string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                        using (NpgsqlCommand command3 = new NpgsqlCommand(query2, connection))
+                        {
+                            command3.Parameters.AddWithValue("@Nonce", block.Nonce);
+                            command3.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                            command3.Parameters.AddWithValue("@SensorId", block.SensorId);
+                            command3.Parameters.AddWithValue("@Address", block.Address);
+                            command3.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                            command3.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                            command3.Parameters.AddWithValue("@Hash", block.Hash);
+
+                            command3.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+
                 connection.Close();
             }
         }
@@ -189,7 +208,7 @@ namespace Banco
             {
                 Block currentBlock = chain[i];
 
-                if (IsValidBlock(currentBlock))
+                if (IsValidBlock(currentBlock) == false)
                 {
                     return "A blockchain está com algum bloco inválido!";
                 }

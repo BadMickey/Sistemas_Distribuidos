@@ -74,7 +74,7 @@ public class NodeClient
     private void RequestChain()
     {
         NetworkStream stream = client.GetStream();
-        byte[] requestChain = Encoding.ASCII.GetBytes("REQUEST_CHAIN");
+        byte[] requestChain = Encoding.UTF8.GetBytes("REQUEST_CHAIN");
         stream.Write(requestChain, 0, requestChain.Length);
 
         // Aguarde a resposta do servidor
@@ -93,7 +93,7 @@ public class NodeClient
             outputStream.Write(buffer, 0, bytesRead);
         }
        // int bytesRead = stream.Read(buffer, 0, buffer.Length);
-        string chainData = Encoding.ASCII.GetString(outputStream.ToArray());
+        string chainData = Encoding.UTF8.GetString(outputStream.ToArray());
 
         List<Block> receivedChain = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Block>>(chainData);
         Console.WriteLine("Cadeia de blocos recebida do nó de servidor!");
@@ -125,7 +125,7 @@ public class NodeClient
     {
         NetworkStream stream = client.GetStream();
         string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(block);
-        byte[] blockBytes = Encoding.ASCII.GetBytes("ADD_BLOCK:" + blockData);
+        byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
         stream.Write(blockBytes, 0, blockBytes.Length);
         Console.WriteLine("Bloco enviado ao servidor: " + block.Nonce);
     }
@@ -135,7 +135,7 @@ public class NodeClient
         NetworkStream stream = client.GetStream();
         byte[] buffer = new byte[1024];
         int bytesRead = stream.Read(buffer, 0, buffer.Length);
-        string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
         if (dataReceived.StartsWith("ADD_BLOCK:"))
         {
