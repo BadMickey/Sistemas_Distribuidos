@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj": {}
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\BlockchainServer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj": {
+    "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\BlockchainServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
-        "projectName": "ProjetoBlockchain",
-        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\ProjetoBlockchain.csproj",
+        "projectUniqueName": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\BlockchainServer.csproj",
+        "projectName": "BlockchainServer",
+        "projectPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\BlockchainServer.csproj",
         "packagesPath": "C:\\Users\\SuasVendas\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\SuasVendas\\source\\repos\\Sistemas_Distribuidos\\Blockchain\\Blockchain\\obj\\",
         "projectStyle": "PackageReference",

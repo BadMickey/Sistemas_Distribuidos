@@ -12,17 +12,21 @@ namespace Banco
     public class Blockchain
     {
         private List<Block> chain = new List<Block>();
+        private List<Block> chain2 = new List<Block>();
         private string connectionString;
 
         public Blockchain(string connectionString)
         {
             this.connectionString = connectionString;
-            //InitializeBlockchain();
         }
-        //Inicializa a blockchain
-        private void InitializeBlockchain()
+        //Atualiza o BD físico do nó cliente
+        public void InitializeBlockchain(List<Block> receivedChain)
         {
-            Boolean genesis = false;
+            foreach (Block block in receivedChain)
+            {
+                chain.Add(block);
+            }
+
             using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
@@ -37,7 +41,7 @@ namespace Banco
                         {
                             while (reader.Read())
                             {
-                                Block genesisBlock = new Block
+                                Block receivedBlock = new Block
                                 {
                                     Nonce = reader.GetInt32(0),
                                     Timestamp = reader.GetDateTime(1),
@@ -47,45 +51,79 @@ namespace Banco
                                     PreviousHash = reader.GetString(5),
                                     Hash = reader.GetString(6)
                                 };
-                                chain.Add(genesisBlock);
+                                chain2.Add(receivedBlock);
                             }
+                            var errorBlocks = chain2.Where(blocoAtrasado => chain.Any(blocoAtualizado => blocoAtualizado.PreviousHash == blocoAtrasado.PreviousHash || 
+                                blocoAtualizado.Hash == blocoAtrasado.Hash)).ToList();
+
+                            if(errorBlocks.Any() )
+                            {
+                                using (NpgsqlCommand command1 = new NpgsqlCommand($"TRUNCATE TABLE blocks", connection))
+                                {
+                                    command1.ExecuteNonQuery();
+                                }
+
+                                foreach (Block block in chain)
+                                {
+                                    string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                                    using (NpgsqlCommand command2 = new NpgsqlCommand(query2, connection))
+                                    {
+                                        command2.Parameters.AddWithValue("@Nonce", block.Nonce);
+                                        command2.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                                        command2.Parameters.AddWithValue("@SensorId", block.SensorId);
+                                        command2.Parameters.AddWithValue("@Address", block.Address);
+                                        command2.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                                        command2.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                                        command2.Parameters.AddWithValue("@Hash", block.Hash);
+
+                                        command2.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                List<Block> attChain = chain.Where(bloco => !chain2.Any(bloco2 => bloco2.Hash == bloco.PreviousHash)).ToList();
+
+                                foreach (Block block in attChain)
+                                {
+                                    string query2 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                                    using (NpgsqlCommand command3 = new NpgsqlCommand(query2, connection))
+                                    {
+                                        command3.Parameters.AddWithValue("@Nonce", block.Nonce);
+                                        command3.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                                        command3.Parameters.AddWithValue("@SensorId", block.SensorId);
+                                        command3.Parameters.AddWithValue("@Address", block.Address);
+                                        command3.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                                        command3.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                                        command3.Parameters.AddWithValue("@Hash", block.Hash);
+
+                                        command3.ExecuteNonQuery();
+                                    }
+                                }
+                            }                           
                         }
                         else
                         {
-                            //Cria o bloco gênese
-                            Block genesisBlock = new Block
+                            foreach (Block block in receivedChain)
                             {
-                                Nonce = 0,
-                                Timestamp = DateTime.Now,
-                                SensorId = 0,
-                                Address = "Bloco gênese",
-                                MotionDetected = false,
-                                PreviousHash = string.Empty,
-                                Hash = string.Empty
-                            };
-                            genesisBlock.Hash = CalculateHash(genesisBlock);
-                            chain.Add(genesisBlock);
-                            genesis = true;
+                                string query1 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                                using (NpgsqlCommand command1 = new NpgsqlCommand(query1, connection))
+                                {
+                                    command1.Parameters.AddWithValue("@Nonce", block.Nonce);
+                                    command1.Parameters.AddWithValue("@Timestamp", block.Timestamp);
+                                    command1.Parameters.AddWithValue("@SensorId", block.SensorId);
+                                    command1.Parameters.AddWithValue("@Address", block.Address);
+                                    command1.Parameters.AddWithValue("@MotionDetected", block.MotionDetected);
+                                    command1.Parameters.AddWithValue("@PreviousHash", block.PreviousHash);
+                                    command1.Parameters.AddWithValue("@Hash", block.Hash);
+
+                                    command1.ExecuteNonQuery();
+                                }
+                            }
                         }
                     }
                 }
-                //Insere o bloco gênese no BD
-                if (genesis == true)
-                {
-                    string query1 = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                    using (NpgsqlCommand command = new NpgsqlCommand(query1, connection))
-                    {
-                        command.Parameters.AddWithValue("@Nonce", chain[0].Nonce);
-                        command.Parameters.AddWithValue("@Timestamp", chain[0].Timestamp);
-                        command.Parameters.AddWithValue("@SensorId", chain[0].SensorId);
-                        command.Parameters.AddWithValue("@Address", chain[0].Address);
-                        command.Parameters.AddWithValue("@MotionDetected", chain[0].MotionDetected);
-                        command.Parameters.AddWithValue("@PreviousHash", chain[0].PreviousHash);
-                        command.Parameters.AddWithValue("@Hash", chain[0].Hash);
-
-                        command.ExecuteNonQuery();
-                    }
-                }
+                connection.Close();
             }
         }
         //Adiciona o bloco na blockchain e BD
@@ -94,24 +132,24 @@ namespace Banco
             
             chain.Add(Sendedblock);
 
-            /*using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
 
                 string query = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
                 using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Nonce", newNonce);
-                    command.Parameters.AddWithValue("@Timestamp", newTimestamp);
-                    command.Parameters.AddWithValue("@SensorId", sensorId);
-                    command.Parameters.AddWithValue("@Address", address);
-                    command.Parameters.AddWithValue("@MotionDetected", motionDetected);
-                    command.Parameters.AddWithValue("@PreviousHash", previousBlock.Hash);
-                    command.Parameters.AddWithValue("@Hash", newHash);
+                    command.Parameters.AddWithValue("@Nonce", Sendedblock.Nonce);
+                    command.Parameters.AddWithValue("@Timestamp", Sendedblock.Timestamp);
+                    command.Parameters.AddWithValue("@SensorId", Sendedblock.SensorId);
+                    command.Parameters.AddWithValue("@Address", Sendedblock.Address);
+                    command.Parameters.AddWithValue("@MotionDetected", Sendedblock.MotionDetected);
+                    command.Parameters.AddWithValue("@PreviousHash", Sendedblock.PreviousHash);
+                    command.Parameters.AddWithValue("@Hash", Sendedblock.Hash);
 
                     command.ExecuteNonQuery();
                 }
-            }*/
+            }
         }
         //Calcula o hash
         public string CalculateHash(Block block)

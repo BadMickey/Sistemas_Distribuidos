@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjetoBlockchain.Banco
+namespace BlockchainClient.Banco
 {
     public class Autenticacao
     {
@@ -18,7 +18,7 @@ namespace ProjetoBlockchain.Banco
 
             if (Email.Equals(EmailAutoridade) && Senha.Equals(SenhaAutoridade))
             {
- //               Program1.AcessoAutoridadeModeradora = true;
+                //Program.AcessoAutoridadeModeradora = true;
             }
         }
     }
