@@ -90,25 +90,30 @@ namespace ProjetoBlockchain
                         Console.Clear();
                         break;
                     case 3:
-                        /*Console.Clear();
+                        Console.Clear();
                         Console.WriteLine("Por favor digite o id do sensor a ter o status alterado: ");
                         sensorid = Convert.ToInt32(Console.ReadLine());
                         Console.WriteLine("Por favor digite o novo status: ");
                         bool NewStatus = bool.Parse(Console.ReadLine());
-                        //Block modBlock = blockchain.ChangeSensorStatus(sensorid, NewStatus);
+                        Block modBlock = blockchain.ChangeSensorStatus(sensorid, NewStatus);
                         Console.WriteLine("Bloco com novo status do sensor montado!");
-                        //SendBlock(modBlock);
-                        //ReceiveBlock();*/
+                        if (blockchain.IsValidBlock(modBlock))
+                        {
+                            blockchain.AddBlock(modBlock);
+                            Console.WriteLine("Bloco aceito e adicionado com sucesso: ");
+                            string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(modBlock);
+                            PropagateBlock(blockData);
+                        }
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
                         Console.Clear();
                         break;
                     case 4:
-                        /*Console.Clear();
+                        Console.Clear();
                         Console.Write("Digite o ID do sensor para localizar: ");
                         int SensorLocalize = Convert.ToInt32(Console.ReadLine());
                         Block latestBlock = blockchain.GetLatestBlockForSensor(SensorLocalize);
-                        Console.WriteLine($"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");*/
+                        Console.WriteLine($"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
                         Console.Clear();

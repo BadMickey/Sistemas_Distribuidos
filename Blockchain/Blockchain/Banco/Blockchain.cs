@@ -211,7 +211,7 @@ namespace Banco
             return "A blockchain está válida!";
         }
         //Altera o status do sensor
-        public void ChangeSensorStatus(int sensorId, bool newStatus)
+        public Block ChangeSensorStatus(int sensorId, bool newStatus)
         {
             Block OldBlock = chain.LastOrDefault(b => b.SensorId == sensorId);
             Block previousBlock = chain[chain.Count - 1];
@@ -231,29 +231,9 @@ namespace Banco
             };
 
             string newHash = CalculateHash(newBlock);
-
             newBlock.Hash = newHash;
-            chain.Add(newBlock);
 
-            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
-            {
-                connection.Open();
-
-                string query = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Nonce", newIndex);
-                    command.Parameters.AddWithValue("@Timestamp", newTimestamp);
-                    command.Parameters.AddWithValue("@SensorId", sensorId);
-                    command.Parameters.AddWithValue("@Address", address);
-                    command.Parameters.AddWithValue("@MotionDetected", newStatus);
-                    command.Parameters.AddWithValue("@PreviousHash", previousBlock.Hash);
-                    command.Parameters.AddWithValue("@Hash", newHash);
-
-                    command.ExecuteNonQuery();
-                }
-                connection.Close();
-            }
+            return newBlock;
         }
 
         public List<Block> GetChain()
