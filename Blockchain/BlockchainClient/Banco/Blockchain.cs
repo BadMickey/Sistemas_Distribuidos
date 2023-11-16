@@ -115,7 +115,6 @@ namespace Banco
                 }
                 else
                 {
-                    //List<Block> attChain = chain.Where(bloco => !chain2.Any(bloco2 => bloco2.Hash == bloco.PreviousHash)).ToList();
 
                     List<Block> attChain = chain
             .Where(blocoAtualizado => !chain2

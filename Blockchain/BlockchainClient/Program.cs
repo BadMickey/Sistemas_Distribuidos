@@ -27,7 +27,8 @@ public class NodeClient
         Console.WriteLine("Conectado ao servidor em " + serverIPAddress + ":" + serverPort);
 
         RequestChain();
-
+        Thread receiverBlocks = new Thread(ReceiverBlocks);
+        receiverBlocks.Start();
 
         while (true)
         {
@@ -49,7 +50,6 @@ public class NodeClient
                     string address = Console.ReadLine();
                     Block newBlock = CreateNewBlock(sensorid, address);
                     SendBlock(newBlock);
-                    ReceiveBlock();
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
                     break;
@@ -95,6 +95,7 @@ public class NodeClient
         stream.Write(requestChain, 0, requestChain.Length);
 
         // Aguarde a resposta do servidor
+        Task.Delay(3000).Wait();
         ReceiveChain();
     }
 
@@ -161,6 +162,34 @@ public class NodeClient
 
             blockchain.AddBlock(receivedBlock);
             Console.WriteLine("Bloco aceito pela blockchain e propagado!");
+        }
+    }
+    private void ReceiverBlocks()
+    {
+        while (true)
+        {
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                string dataReceived = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+                if (dataReceived.StartsWith("ADD_BLOCK:"))
+                {
+                    string blockData = dataReceived.Replace("ADD_BLOCK:", "");
+                    Block receivedBlock = Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(blockData);
+                    blockchain.AddBlock(receivedBlock);
+                    // Você pode verificar se o bloco foi aceito pelo servidor aqui
+                    Console.WriteLine($"Bloco recebido do servidor: {receivedBlock.Nonce}");
+                }
+            }
+            catch (IOException)
+            {
+                // Ocorre quando a conexão é fechada pelo servidor
+                Console.WriteLine("Conexão com o servidor encerrada.");
+                break;
+            }
         }
     }
 }
