@@ -74,18 +74,20 @@ namespace ProjetoBlockchain
                         if (blockchain.IsValidBlock(newBlock))
                         {
                             blockchain.AddBlock(newBlock);
-                            Console.WriteLine("Bloco adicionado com sucesso: " + newBlock.Nonce);
+                            Console.WriteLine("Bloco aceito e adicionado com sucesso: ");
                             string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(newBlock);
                             PropagateBlock(blockData);
                         }
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
+                        Console.Clear();
                         break;
                     case 2:
                         Console.Clear();
                         Console.WriteLine(blockchain.IsChainValid());
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
+                        Console.Clear();
                         break;
                     case 3:
                         /*Console.Clear();
@@ -99,6 +101,7 @@ namespace ProjetoBlockchain
                         //ReceiveBlock();*/
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
+                        Console.Clear();
                         break;
                     case 4:
                         /*Console.Clear();
@@ -108,6 +111,7 @@ namespace ProjetoBlockchain
                         Console.WriteLine($"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");*/
                         Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                         Console.ReadKey();
+                        Console.Clear();
                         break;
                     default:
                         Console.Clear();
@@ -137,7 +141,7 @@ namespace ProjetoBlockchain
                             if (blockchain.IsValidBlock(receivedBlock))
                             {
                                 blockchain.AddBlock(receivedBlock);
-                                Console.WriteLine("Bloco adicionado com sucesso: " + receivedBlock.Nonce);
+                                Console.WriteLine("Bloco recebido por um nó cliente foi validado e adicionado com sucesso!");
                                 PropagateBlock(blockData, client);
 
                             }
@@ -158,7 +162,7 @@ namespace ProjetoBlockchain
             catch (IOException)
             {
                 clients.Remove(client);
-                Console.WriteLine("Cliente com o ip " + ((IPEndPoint)client.Client.RemoteEndPoint).Address + "foi desconectado!");
+                Console.WriteLine("Cliente com o ip " + ((IPEndPoint)client.Client.RemoteEndPoint).Address + " foi desconectado!");
                 client.Close();
             }
         }
@@ -167,28 +171,38 @@ namespace ProjetoBlockchain
         {
             lock (clientListLock)
             {
-                foreach (TcpClient client in clients)
+                if (clients.Count > 0)
                 {
-                    NetworkStream stream = client.GetStream();
-                    byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
-                    stream.Write(blockBytes, 0, blockBytes.Length);
+                    foreach (TcpClient client in clients)
+                    {
+                        NetworkStream stream = client.GetStream();
+                        byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
+                        stream.Write(blockBytes, 0, blockBytes.Length);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
                 }
             }
         }
         private void PropagateBlock(string blockData)
         {
-            if(clients.Count > 0)
+            lock (clientListLock)
             {
-                foreach (TcpClient client in clients)
+                if (clients.Count > 0)
                 {
-                    NetworkStream stream = client.GetStream();
-                    byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
-                    stream.Write(blockBytes, 0, blockBytes.Length);
+                    foreach (TcpClient client in clients)
+                    {
+                        NetworkStream stream = client.GetStream();
+                        byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
+                        stream.Write(blockBytes, 0, blockBytes.Length);
+                    }
                 }
-            }
-            else
-            {
-                Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
+                else
+                {
+                    Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
+                }
             }
 
         }

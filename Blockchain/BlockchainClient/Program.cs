@@ -52,12 +52,14 @@ public class NodeClient
                     SendBlock(newBlock);
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
+                    Console.Clear();
                     break;
                 case 2:
                     Console.Clear();
                     Console.WriteLine(blockchain.IsChainValid());
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
+                    Console.Clear();
                     break;
                 case 3:
                     Console.Clear();
@@ -71,6 +73,7 @@ public class NodeClient
                     ReceiveBlock();
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
+                    Console.Clear();
                     break;
                 case 4:
                     Console.Clear();
@@ -80,6 +83,7 @@ public class NodeClient
                     Console.WriteLine($"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
+                    Console.Clear();
                     break;
                 default:
                     Console.Clear();
