@@ -12,6 +12,7 @@ namespace Banco
     public class Blockchain
     {
         private List<Block> chain = new List<Block>();
+        private object chainLock = new object();
         private string connectionString;
 
         public Blockchain(string connectionString)
@@ -135,26 +136,29 @@ namespace Banco
         }
         public void AddBlock(Block receivedBlock)
         {
-            chain.Add(receivedBlock);
-
-            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+            lock (chainLock)
             {
-                connection.Open();
+                chain.Add(receivedBlock);
 
-                string query = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
-                using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
+                using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
                 {
-                    command.Parameters.AddWithValue("@Nonce", receivedBlock.Nonce);
-                    command.Parameters.AddWithValue("@Timestamp", receivedBlock.Timestamp);
-                    command.Parameters.AddWithValue("@SensorId", receivedBlock.SensorId);
-                    command.Parameters.AddWithValue("@Address", receivedBlock.Address);
-                    command.Parameters.AddWithValue("@MotionDetected", receivedBlock.MotionDetected);
-                    command.Parameters.AddWithValue("@PreviousHash", receivedBlock.PreviousHash);
-                    command.Parameters.AddWithValue("@Hash", receivedBlock.Hash);
+                    connection.Open();
 
-                    command.ExecuteNonQuery();
+                    string query = "INSERT INTO Blocks (Nonce, Timestamp, SensorId, Address, MotionDetected, PreviousHash, Hash) VALUES (@Nonce, @Timestamp, @SensorId, @Address, @MotionDetected, @PreviousHash, @Hash)";
+                    using (NpgsqlCommand command = new NpgsqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Nonce", receivedBlock.Nonce);
+                        command.Parameters.AddWithValue("@Timestamp", receivedBlock.Timestamp);
+                        command.Parameters.AddWithValue("@SensorId", receivedBlock.SensorId);
+                        command.Parameters.AddWithValue("@Address", receivedBlock.Address);
+                        command.Parameters.AddWithValue("@MotionDetected", receivedBlock.MotionDetected);
+                        command.Parameters.AddWithValue("@PreviousHash", receivedBlock.PreviousHash);
+                        command.Parameters.AddWithValue("@Hash", receivedBlock.Hash);
+
+                        command.ExecuteNonQuery();
+                    }
+                    connection.Close();
                 }
-                connection.Close();
             }
         }
         //Calcula o hash
@@ -170,23 +174,26 @@ namespace Banco
         }
         public bool IsValidBlock(Block block)
         {
-            if (block.Nonce > 0)
+            lock (chainLock)
             {
-                // Validate the block's hash
-                string expectedHash = CalculateHash(block);
-                if (block.Hash != expectedHash)
+                if (block.Nonce > 0)
                 {
-                    return false;
-                }
+                    // Validate the block's hash
+                    string expectedHash = CalculateHash(block);
+                    if (block.Hash != expectedHash)
+                    {
+                        return false;
+                    }
 
-                // Ensure the previous hash matches the last block's hash
-                Block previousBlock = chain[block.Nonce - 1];
-                if (block.PreviousHash != previousBlock.Hash)
-                {
-                    return false;
+                    // Ensure the previous hash matches the last block's hash
+                    Block previousBlock = chain[block.Nonce - 1];
+                    if (block.PreviousHash != previousBlock.Hash)
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
         }
             //Verifica se a blockchain está válida
         public string IsChainValid()
@@ -195,7 +202,7 @@ namespace Banco
             {
                 Block currentBlock = chain[i];
 
-                if (IsValidBlock(currentBlock))
+                if (IsValidBlock(currentBlock) == false)
                 {
                     return "A blockchain está com algum bloco inválido!";
                 }
@@ -251,13 +258,25 @@ namespace Banco
 
         public List<Block> GetChain()
         {
-            return chain;
+            lock (chainLock)
+            {
+                return chain;
+            }
         }
 
-            //Busca o bloco mais recente que possui um determinado ID de sensor
-            public Block GetLatestBlockForSensor(int sensorId)
+         //Busca o bloco mais recente que possui um determinado ID de sensor
+        public Block GetLatestBlockForSensor(int sensorId)
         {
             return chain.LastOrDefault(b => b.SensorId == sensorId);
+        }
+        public string GetPreviousHash()
+        {
+            return chain.Last().Hash;
+        }
+
+        public int GetPreviousNonce()
+        {
+            return chain.Last().Nonce;
         }
     }
 
