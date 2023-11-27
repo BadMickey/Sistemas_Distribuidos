@@ -153,8 +153,13 @@ namespace ProjetoBlockchain
 
                             // Propague o bloco para outros clientes
                         }
+                        if (dataReceived.StartsWith("ADD_BLOCK_API:"))
+                        {
+                            Console.WriteLine("Info recebida");
+                        }
 
-                        if (dataReceived == "REQUEST_CHAIN")
+
+                            if (dataReceived == "REQUEST_CHAIN")
                         {
                             List<Block> chain = blockchain.GetChain();
                             string chainData = Newtonsoft.Json.JsonConvert.SerializeObject(chain);
