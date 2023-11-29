@@ -8,7 +8,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-
+using BlockchainServer.Model;
 
 namespace ProjetoBlockchain
 {
@@ -44,7 +44,16 @@ namespace ProjetoBlockchain
                 TcpClient client = listener.AcceptTcpClient();
                 clients.Add(client);
 
-                Console.WriteLine("Novo cliente conectado: " + ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+
+                if(((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("25.7.69.196")))
+                {
+                    Console.WriteLine("API abriu uma conexão");
+                }
+                else
+                {
+                    Console.WriteLine("Novo cliente conectado: " + ((IPEndPoint)client.Client.RemoteEndPoint).Address);
+
+                }
 
                 Thread clientThread = new Thread(() => HandleClient(client));
                 clientThread.Start();
@@ -155,11 +164,33 @@ namespace ProjetoBlockchain
                         }
                         if (dataReceived.StartsWith("ADD_BLOCK_API:"))
                         {
-                            Console.WriteLine("Info recebida");
+                            string infoData = dataReceived.Replace("ADD_BLOCK_API:", "");
+                            Info receivedInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Info>(infoData);
+                            Block newBlock = CreateNewBlock(receivedInfo.SensorId, receivedInfo.Address);
+                            if (blockchain.IsValidBlock(newBlock))
+                            {
+                                blockchain.AddBlock(newBlock);
+                                Console.WriteLine("Bloco aceito da API e adicionado com sucesso!");
+                                string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(newBlock);
+                                PropagateBlock(blockData);
+                            }
                         }
 
+                        if (dataReceived.StartsWith("CHANGE_STATUS_API:"))
+                        {
+                            string infoData = dataReceived.Replace("CHANGE_STATUS_API:", "");
+                            Info receivedInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Info>(infoData);
+                            Block modBlock = blockchain.ChangeSensorStatus(receivedInfo.SensorId, receivedInfo.MotionDetected);
+                            if (blockchain.IsValidBlock(modBlock))
+                            {
+                                blockchain.AddBlock(modBlock);
+                                Console.WriteLine("Bloco com novo status de um sensor enviado pela API foi adicionado!");
+                                string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(modBlock);
+                                PropagateBlock(blockData);
+                            }
+                        }
 
-                            if (dataReceived == "REQUEST_CHAIN")
+                        if (dataReceived == "REQUEST_CHAIN")
                         {
                             List<Block> chain = blockchain.GetChain();
                             string chainData = Newtonsoft.Json.JsonConvert.SerializeObject(chain);
@@ -172,7 +203,14 @@ namespace ProjetoBlockchain
             catch (IOException)
             {
                 clients.Remove(client);
-                Console.WriteLine("Cliente com o ip " + ((IPEndPoint)client.Client.RemoteEndPoint).Address + " foi desconectado!");
+                if (((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("25.7.69.196")))
+                {
+                    Console.WriteLine("API fechou a conexão");
+                }
+                else
+                {
+                    Console.WriteLine("Cliente com o ip " + ((IPEndPoint)client.Client.RemoteEndPoint).Address + " foi desconectado!");
+                }
                 client.Close();
             }
         }
