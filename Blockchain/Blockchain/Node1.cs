@@ -45,7 +45,7 @@ namespace ProjetoBlockchain
                 clients.Add(client);
 
 
-                if(((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("25.7.69.196")))
+                if(((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("10.4.6.30")))
                 {
                     Console.WriteLine("API abriu uma conexão");
                 }
@@ -156,11 +156,8 @@ namespace ProjetoBlockchain
                             {
                                 blockchain.AddBlock(receivedBlock);
                                 Console.WriteLine("Bloco recebido por um nó cliente foi validado e adicionado com sucesso!");
-                                PropagateBlock(blockData, client);
-
+                                PropagateBlock(blockData);
                             }
-
-                            // Propague o bloco para outros clientes
                         }
                         if (dataReceived.StartsWith("ADD_BLOCK_API:"))
                         {
@@ -172,10 +169,10 @@ namespace ProjetoBlockchain
                                 blockchain.AddBlock(newBlock);
                                 Console.WriteLine("Bloco aceito da API e adicionado com sucesso!");
                                 string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(newBlock);
-                                PropagateBlock(blockData);
+                                string message = "Novo sensor recebido, processado e adicionado com sucesso!";
+                                PropagateBlock(blockData, message);
                             }
                         }
-
                         if (dataReceived.StartsWith("CHANGE_STATUS_API:"))
                         {
                             string infoData = dataReceived.Replace("CHANGE_STATUS_API:", "");
@@ -186,8 +183,21 @@ namespace ProjetoBlockchain
                                 blockchain.AddBlock(modBlock);
                                 Console.WriteLine("Bloco com novo status de um sensor enviado pela API foi adicionado!");
                                 string blockData = Newtonsoft.Json.JsonConvert.SerializeObject(modBlock);
-                                PropagateBlock(blockData);
+                                string message = "Novo status do sensor alterado com sucesso!";
+                                PropagateBlock(blockData, message);
                             }
+                        }
+                        if (dataReceived.StartsWith("VERIFY_CHAIN_API:"))
+                        {
+                            string infoData = dataReceived.Replace("VERIFY_CHAIN_API:", "");
+                            SendConfirmationMessage(client, blockchain.IsChainValid());
+                        }
+                        if (dataReceived.StartsWith("VERIFY_STATUS_API:"))
+                        {
+                            string infoData = dataReceived.Replace("VERIFY_STATUS_API:", "");
+                            Info receivedInfo = Newtonsoft.Json.JsonConvert.DeserializeObject<Info>(infoData);
+                            Block latestBlock = blockchain.GetLatestBlockForSensor(receivedInfo.SensorId);
+                            SendConfirmationMessage(client,$"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");
                         }
 
                         if (dataReceived == "REQUEST_CHAIN")
@@ -203,7 +213,7 @@ namespace ProjetoBlockchain
             catch (IOException)
             {
                 clients.Remove(client);
-                if (((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("25.7.69.196")))
+                if (((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("10.4.6.30")))
                 {
                     Console.WriteLine("API fechou a conexão");
                 }
@@ -215,25 +225,6 @@ namespace ProjetoBlockchain
             }
         }
 
-        private void PropagateBlock(string blockData, TcpClient senderClient)
-        {
-            lock (clientListLock)
-            {
-                if (clients.Count > 0)
-                {
-                    foreach (TcpClient client in clients)
-                    {
-                        NetworkStream stream = client.GetStream();
-                        byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
-                        stream.Write(blockBytes, 0, blockBytes.Length);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
-                }
-            }
-        }
         private void PropagateBlock(string blockData)
         {
             lock (clientListLock)
@@ -252,7 +243,32 @@ namespace ProjetoBlockchain
                     Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
                 }
             }
-
+        }
+        private void PropagateBlock(string blockData, string message)
+        {
+            lock (clientListLock)
+            {
+                if (clients.Count > 0)
+                {
+                    foreach (TcpClient client in clients)
+                    {
+                        if (((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString() == "10.4.6.30")
+                        {
+                            SendConfirmationMessage(client, message);
+                        }
+                        else
+                        {
+                            NetworkStream stream = client.GetStream();
+                            byte[] blockBytes = Encoding.UTF8.GetBytes("ADD_BLOCK:" + blockData);
+                            stream.Write(blockBytes, 0, blockBytes.Length);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Não há nenhum nó cliente conectado para propagar o bloco, quando algum se conectar, ele automaticamente receberá a chain atualizada!");
+                }
+            }
         }
         private Block CreateNewBlock(int sensorid, string address)
         {
@@ -272,6 +288,12 @@ namespace ProjetoBlockchain
             newBlock.Hash = blockchain.CalculateHash(newBlock);
 
             return newBlock;
+        }
+        private static void SendConfirmationMessage(TcpClient client, string message)
+        {
+            NetworkStream stream = client.GetStream();
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+            stream.Write(messageBytes, 0, messageBytes.Length);
         }
     }
 

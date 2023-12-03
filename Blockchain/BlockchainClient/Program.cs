@@ -8,7 +8,7 @@ using Banco;
 
 public class NodeClient
 {
-    private const string serverIPAddress = "192.168.0.217"; // Substitua pelo IP do servidor
+    private const string serverIPAddress = "10.4.6.30"; // Substitua pelo IP do servidor
     private const int serverPort = 13000;
     static string connectionString = "Server=localhost;Port=5433;User Id=postgres;Password=0000;database=Blockchain";
 

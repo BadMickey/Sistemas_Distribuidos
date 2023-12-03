@@ -4,10 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlockchainServer", "Blockchain\BlockchainServer.csproj", "{0D3EC868-8B17-4AA9-849A-29E981151CAC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B0EC62D3-9E6C-4219-AB99-16F09D40AC97} = {B0EC62D3-9E6C-4219-AB99-16F09D40AC97}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjetoFleck", "ProjetoFleck\ProjetoFleck.csproj", "{8CC8E775-0AE8-4B06-9E6B-585CA0BE995E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockchainClient", "BlockchainClient\BlockchainClient.csproj", "{B0EC62D3-9E6C-4219-AB99-16F09D40AC97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlockchainClient", "BlockchainClient\BlockchainClient.csproj", "{B0EC62D3-9E6C-4219-AB99-16F09D40AC97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +20,6 @@ Global
 		{0D3EC868-8B17-4AA9-849A-29E981151CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D3EC868-8B17-4AA9-849A-29E981151CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D3EC868-8B17-4AA9-849A-29E981151CAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8CC8E775-0AE8-4B06-9E6B-585CA0BE995E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8CC8E775-0AE8-4B06-9E6B-585CA0BE995E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8CC8E775-0AE8-4B06-9E6B-585CA0BE995E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8CC8E775-0AE8-4B06-9E6B-585CA0BE995E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0EC62D3-9E6C-4219-AB99-16F09D40AC97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0EC62D3-9E6C-4219-AB99-16F09D40AC97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0EC62D3-9E6C-4219-AB99-16F09D40AC97}.Release|Any CPU.ActiveCfg = Release|Any CPU
