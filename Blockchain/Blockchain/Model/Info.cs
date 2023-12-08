@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlockchainServer.Model
 {
+    //Modelo que vai ser usado para receber e deserializar o objeto da info da API
     public class Info
     {
         public int SensorId { get; set; }

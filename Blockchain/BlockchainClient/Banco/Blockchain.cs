@@ -60,7 +60,7 @@ namespace Banco
                         }
                     }
                 }
-
+                // Verifica se a chain física está com algum bloco errado em relação a chain recebida do servidor
                 var errorBlocks = chain2
             .Where(blocoAtrasado => !chain
                 .Any(blocoAtualizado =>
@@ -68,7 +68,7 @@ namespace Banco
                     blocoAtualizado.Hash == blocoAtrasado.Hash))
             .ToList();
 
-
+                // Se o BD físico estiver vázio, apenas adiciona a chain recebida no BD
                 if (vazio)
                 {
                     foreach (Block block in receivedChain)
@@ -89,6 +89,7 @@ namespace Banco
                     }
                 }
 
+                // Se existir um bloco errado, o BD é limpo e recebe a chain atual
                 else if (errorBlocks.Any())
                 {
                     using (NpgsqlCommand command1 = new NpgsqlCommand($"TRUNCATE TABLE blocks", connection))
@@ -113,9 +114,9 @@ namespace Banco
                         }
                     }
                 }
+                // Se não tiver blocos errados, apenas calcula os blocos faltantes no BD físico e adiciona, basicamente só atualiza o BD físico
                 else
                 {
-
                     List<Block> attChain = chain
             .Where(blocoAtualizado => !chain2
                 .Any(blocoAtrasado =>
@@ -180,18 +181,19 @@ namespace Banco
                 return Convert.ToBase64String(hashBytes);
             }
         }
+        //Valida se o bloco é valido
         public bool IsValidBlock(Block block)
         {
             if (block.Nonce > 0)
             {
-                // Validate the block's hash
+                // Validate o hash do bloco
                 string expectedHash = CalculateHash(block);
                 if (block.Hash != expectedHash)
                 {
                     return false;
                 }
 
-                // Ensure the previous hash matches the last block's hash
+                // Certifica se o hash anterior do bloco atual é igual ao hash do bloco anterior
                 Block previousBlock = chain[block.Nonce - 1];
                 if (block.PreviousHash != previousBlock.Hash)
                 {
@@ -245,12 +247,12 @@ namespace Banco
         {
             return chain.LastOrDefault(b => b.SensorId == sensorId);
         }
-
+        // Pega o hash anterior
         public string GetPreviousHash()
         {
             return chain.Last().Hash;
         }
-
+        // Pega o Nonce anterior
         public int GetPreviousNonce()
         {
             return chain.Last().Nonce;

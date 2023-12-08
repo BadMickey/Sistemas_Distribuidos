@@ -8,6 +8,7 @@ using Banco;
 
 public class NodeClient
 {
+    // Configurações do BD e nó servidor
     private const string serverIPAddress = "10.4.6.30"; // Substitua pelo IP do servidor
     private const int serverPort = 13000;
     static string connectionString = "Server=localhost;Port=5433;User Id=postgres;Password=0000;database=Blockchain";
@@ -23,6 +24,7 @@ public class NodeClient
 
     public void Start()
     {
+        // Se conecta ao nó servidor
         client.Connect(serverIPAddress, serverPort);
         Console.WriteLine("Conectado ao servidor em " + serverIPAddress + ":" + serverPort);
 
@@ -30,6 +32,7 @@ public class NodeClient
         Thread receiverBlocks = new Thread(ReceiverBlocks);
         receiverBlocks.Start();
 
+        //Looping de menu do nó cliente
         while (true)
         {
             Console.WriteLine("Bem-vindo a central de controle do nó cliente, você tem as seguintes ações:");
@@ -42,6 +45,7 @@ public class NodeClient
 
             switch (opcao)
             {
+                //adiciona sensor
                 case 1:
                     Console.Clear();
                     Console.WriteLine("Por favor digite o id do sensor: ");
@@ -54,6 +58,7 @@ public class NodeClient
                     Console.ReadKey();
                     Console.Clear();
                     break;
+                //verifica a chain               
                 case 2:
                     Console.Clear();
                     Console.WriteLine(blockchain.IsChainValid());
@@ -61,6 +66,7 @@ public class NodeClient
                     Console.ReadKey();
                     Console.Clear();
                     break;
+                //altera o status
                 case 3:
                     Console.Clear();
                     Console.WriteLine("Por favor digite o id do sensor a ter o status alterado: ");
@@ -70,11 +76,11 @@ public class NodeClient
                     Block modBlock = blockchain.ChangeSensorStatus(sensorid, NewStatus);
                     Console.WriteLine("Bloco com novo status do sensor montado!");
                     SendBlock(modBlock);
-                    ReceiveBlock();
                     Console.WriteLine("Deseja voltar para executar outros comandos? Se sim aperte qualquer tecla!");
                     Console.ReadKey();
                     Console.Clear();
                     break;
+                //localiza o status mais recente
                 case 4:
                     Console.Clear();
                     Console.Write("Digite o ID do sensor para localizar: ");
@@ -91,7 +97,7 @@ public class NodeClient
             }
         }
     }
-
+    // Envia um Json para o servidor solicitando a chain atual
     private void RequestChain()
     {
         NetworkStream stream = client.GetStream();
@@ -103,6 +109,7 @@ public class NodeClient
         ReceiveChain();
     }
 
+    // Recebe o Json de resposta contendo a chain
     private void ReceiveChain()
     {
         NetworkStream stream = client.GetStream();
@@ -114,7 +121,6 @@ public class NodeClient
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
             outputStream.Write(buffer, 0, bytesRead);
         }
-       // int bytesRead = stream.Read(buffer, 0, buffer.Length);
         string chainData = Encoding.UTF8.GetString(outputStream.ToArray());
 
         List<Block> receivedChain = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Block>>(chainData);
@@ -122,6 +128,7 @@ public class NodeClient
 
         blockchain.InitializeBlockchain(receivedChain);
     }
+    // Cria um bloco novo
 
     private Block CreateNewBlock(int sensorid, string address)
     {
@@ -142,7 +149,7 @@ public class NodeClient
 
         return newBlock;
     }
-
+    // Envia um bloco para o nó servidor
     private void SendBlock(Block block)
     {
         NetworkStream stream = client.GetStream();
@@ -151,23 +158,7 @@ public class NodeClient
         stream.Write(blockBytes, 0, blockBytes.Length);
         Console.WriteLine("Bloco enviado ao servidor: " + block.Nonce);
     }
-
-    private void ReceiveBlock()
-    {
-        NetworkStream stream = client.GetStream();
-        byte[] buffer = new byte[1024];
-        int bytesRead = stream.Read(buffer, 0, buffer.Length);
-        string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-        if (dataReceived.StartsWith("ADD_BLOCK:"))
-        {
-            string blockData = dataReceived.Replace("ADD_BLOCK:", "");
-            Block receivedBlock = Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(blockData);
-
-            blockchain.AddBlock(receivedBlock);
-            Console.WriteLine("Bloco aceito pela blockchain e propagado!");
-        }
-    }
+    // Recebe um bloco do nó servidor
     private void ReceiverBlocks()
     {
         while (true)

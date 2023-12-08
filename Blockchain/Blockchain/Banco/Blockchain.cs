@@ -134,6 +134,7 @@ namespace Banco
                 connection.Close();
             }
         }
+        //sobre carga que recebe o bloco já pronto, adiciona na chain e BD
         public void AddBlock(Block receivedBlock)
         {
             lock (chainLock)
@@ -172,20 +173,21 @@ namespace Banco
                 return Convert.ToBase64String(hashBytes);
             }
         }
+        //Valida se o bloco é valido
         public bool IsValidBlock(Block block)
         {
             lock (chainLock)
             {
                 if (block.Nonce > 0)
                 {
-                    // Validate the block's hash
+                    // Validate o hash do bloco
                     string expectedHash = CalculateHash(block);
                     if (block.Hash != expectedHash)
                     {
                         return false;
                     }
 
-                    // Ensure the previous hash matches the last block's hash
+                    // Certifica se o hash anterior do bloco atual é igual ao hash do bloco anterior
                     Block previousBlock = chain[block.Nonce - 1];
                     if (block.PreviousHash != previousBlock.Hash)
                     {
@@ -235,7 +237,7 @@ namespace Banco
 
             return newBlock;
         }
-
+        // Devolve a lista com a chain
         public List<Block> GetChain()
         {
             lock (chainLock)
@@ -249,11 +251,13 @@ namespace Banco
         {
             return chain.LastOrDefault(b => b.SensorId == sensorId);
         }
+        // Pega o hash anterior
         public string GetPreviousHash()
         {
             return chain.Last().Hash;
         }
 
+        // Pega o Nonce anterior
         public int GetPreviousNonce()
         {
             return chain.Last().Nonce;

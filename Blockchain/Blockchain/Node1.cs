@@ -14,6 +14,7 @@ namespace ProjetoBlockchain
 {
     public class Node1
     {
+        //Conexão com banco de dados
         static string connectionString = "Server=localhost;Port=5433;User Id=postgres;Password=0000;database=Blockchain";
         private const int listenPort = 13000;
 
@@ -38,13 +39,13 @@ namespace ProjetoBlockchain
             Thread menuSender = new Thread(MenuSender);
             menuSender.Start();
 
-
+            //looping para abrir threads para cada conexão
             while (true)
             {
                 TcpClient client = listener.AcceptTcpClient();
                 clients.Add(client);
 
-
+                //diferencia se é a API
                 if(((IPEndPoint)client.Client.RemoteEndPoint).Address.Equals(IPAddress.Parse("10.4.6.30")))
                 {
                     Console.WriteLine("API abriu uma conexão");
@@ -61,6 +62,7 @@ namespace ProjetoBlockchain
         }
         public void MenuSender()
         {
+            //looping dos comandos de menu
             while (true)
             {
                 Console.WriteLine("Bem-vindo a central de controle do nó servidor, você tem as seguintes ações:");
@@ -73,6 +75,7 @@ namespace ProjetoBlockchain
 
                 switch (opcao)
                 {
+                    //adiciona sensor
                     case 1:
                         Console.Clear();
                         Console.WriteLine("Por favor digite o id do sensor: ");
@@ -91,6 +94,7 @@ namespace ProjetoBlockchain
                         Console.ReadKey();
                         Console.Clear();
                         break;
+                    //verifica a chain               
                     case 2:
                         Console.Clear();
                         Console.WriteLine(blockchain.IsChainValid());
@@ -98,6 +102,7 @@ namespace ProjetoBlockchain
                         Console.ReadKey();
                         Console.Clear();
                         break;
+                    //altera o status
                     case 3:
                         Console.Clear();
                         Console.WriteLine("Por favor digite o id do sensor a ter o status alterado: ");
@@ -117,6 +122,7 @@ namespace ProjetoBlockchain
                         Console.ReadKey();
                         Console.Clear();
                         break;
+                    //localiza o status mais recente
                     case 4:
                         Console.Clear();
                         Console.Write("Digite o ID do sensor para localizar: ");
@@ -133,7 +139,7 @@ namespace ProjetoBlockchain
                 }
             }
         }
-
+        //gerencia a thread da conexão
         private void HandleClient(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
@@ -146,7 +152,7 @@ namespace ProjetoBlockchain
                     lock (clientListLock)
                     {
                         string dataReceived = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
+                        //verifica se o json recebido é para adicionar um bloco
                         if (dataReceived.StartsWith("ADD_BLOCK:"))
                         {
                             string blockData = dataReceived.Replace("ADD_BLOCK:", "");
@@ -159,6 +165,7 @@ namespace ProjetoBlockchain
                                 PropagateBlock(blockData);
                             }
                         }
+                        //verifica se o json recebido é para adicionar um bloco vindo da API
                         if (dataReceived.StartsWith("ADD_BLOCK_API:"))
                         {
                             string infoData = dataReceived.Replace("ADD_BLOCK_API:", "");
@@ -173,6 +180,7 @@ namespace ProjetoBlockchain
                                 PropagateBlock(blockData, message);
                             }
                         }
+                        //verifica se o json recebido pela api é para alterar um bloco
                         if (dataReceived.StartsWith("CHANGE_STATUS_API:"))
                         {
                             string infoData = dataReceived.Replace("CHANGE_STATUS_API:", "");
@@ -187,11 +195,14 @@ namespace ProjetoBlockchain
                                 PropagateBlock(blockData, message);
                             }
                         }
+                        //verifica se o json recebido pela api é para verificar a cadeia
                         if (dataReceived.StartsWith("VERIFY_CHAIN_API:"))
                         {
                             string infoData = dataReceived.Replace("VERIFY_CHAIN_API:", "");
                             SendConfirmationMessage(client, blockchain.IsChainValid());
                         }
+                        //verifica se o json recebido pela api é para verificar o status de algum sensor
+
                         if (dataReceived.StartsWith("VERIFY_STATUS_API:"))
                         {
                             string infoData = dataReceived.Replace("VERIFY_STATUS_API:", "");
@@ -199,7 +210,7 @@ namespace ProjetoBlockchain
                             Block latestBlock = blockchain.GetLatestBlockForSensor(receivedInfo.SensorId);
                             SendConfirmationMessage(client,$"Último bloco com esse Id está com o seguinte status de alarme: {latestBlock?.MotionDetected}");
                         }
-
+                        //verifica se o json recebido pela api é para enviar a cadeia para o nó cliente
                         if (dataReceived == "REQUEST_CHAIN")
                         {
                             List<Block> chain = blockchain.GetChain();
@@ -210,6 +221,7 @@ namespace ProjetoBlockchain
                     }
                 }
             }
+            //Trata a desconexão se é de um nó cliente ou a API
             catch (IOException)
             {
                 clients.Remove(client);
@@ -224,7 +236,7 @@ namespace ProjetoBlockchain
                 client.Close();
             }
         }
-
+        //Propaga o bloco para todos os nós conectados
         private void PropagateBlock(string blockData)
         {
             lock (clientListLock)
@@ -244,6 +256,8 @@ namespace ProjetoBlockchain
                 }
             }
         }
+        /*Propaga o bloco para todos os nós conectados, mas está utiliza somente quando é vindo de uma API 
+          para evitar que a API acabe recebendo o json do bloco e só receba a mensagem de confirmação mesmo*/
         private void PropagateBlock(string blockData, string message)
         {
             lock (clientListLock)
@@ -252,6 +266,7 @@ namespace ProjetoBlockchain
                 {
                     foreach (TcpClient client in clients)
                     {
+                        //verifica se é o IP da API
                         if (((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString() == "10.4.6.30")
                         {
                             SendConfirmationMessage(client, message);
@@ -270,6 +285,7 @@ namespace ProjetoBlockchain
                 }
             }
         }
+        //Aqui cria um novo bloco
         private Block CreateNewBlock(int sensorid, string address)
         {
 
@@ -289,6 +305,7 @@ namespace ProjetoBlockchain
 
             return newBlock;
         }
+        //Função para retornar a mensagem para a API
         private static void SendConfirmationMessage(TcpClient client, string message)
         {
             NetworkStream stream = client.GetStream();
